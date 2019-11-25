@@ -4,6 +4,7 @@ import java.security.Principal;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,18 +32,18 @@ public class UserAccountController {
 	}
 	
 	@PostMapping("/login")
-	public UserProfileDto userLogin(Principal principal) {
-		return userAccountService.findUser(principal.getName());
+	public UserProfileDto userLogin(Authentication authentication) {
+		return userAccountService.findUser(authentication.getName());
 	}
 	
 	@DeleteMapping("/user")
-	public UserProfileDto removeUser(Principal principal) {
-		return userAccountService.removeUser(principal.getName());
+	public UserProfileDto removeUser(Authentication authentication) {
+		return userAccountService.removeUser(authentication.getName());
 	}
 	
 	@PutMapping("/user")
-	public UserProfileDto editUser(@RequestBody UserEditDto userEditDto, Principal principal) {
-		return userAccountService.editUser(userEditDto, principal.getName());
+	public UserProfileDto editUser(@RequestBody UserEditDto userEditDto, Authentication authentication) {
+		return userAccountService.editUser(userEditDto, authentication.getName());
 	}
 	
 	@PostMapping("/user/{login}/role/{role}")
@@ -56,8 +57,8 @@ public class UserAccountController {
 	}
 	
 	@PutMapping("/user/password")
-	public void changePassword(Principal principal, @RequestHeader("X-Password") String password) {
-		userAccountService.changePassword(principal.getName(), password);
+	public void changePassword(Authentication authentication, @RequestHeader("X-Password") String password) {
+		userAccountService.changePassword(authentication.getName(), password);
 	}
 	
 
