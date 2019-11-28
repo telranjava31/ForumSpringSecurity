@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 import telran.forum.dao.ForumRepository;
 import telran.forum.dao.UserAccountRepository;
 import telran.forum.model.Post;
-import telran.forum.model.UserAccount;
 
 @Component("customSecurity")
 public class CustomWebSecurity {
@@ -18,7 +17,7 @@ public class CustomWebSecurity {
 	@Autowired
 	ForumRepository forumRepository;
 	
-	public boolean checkAuthorityForDeletePost(String id, Authentication authentication) {
+	public boolean checkAuthorityForPost(String id, Authentication authentication) {
 		Post post = forumRepository.findById(id).orElse(null);
 		if (post == null) {
 			return false;
@@ -27,6 +26,6 @@ public class CustomWebSecurity {
 //				userAccountRepository.findById(authentication.getName()).get();
 //		return post.getAuthor().equals(authentication.getName()) 
 //				|| userAccount.getRoles().contains("Moderator");
-		return post.getAuthor().equals(authentication.getName());
+		return post.getAuthor().equals(authentication.getName()) && !authentication.getAuthorities().isEmpty();
 	}
 }

@@ -25,13 +25,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 		http.authorizeRequests()
 			.antMatchers("/forum/posts/**").permitAll()
-			.antMatchers(HttpMethod.PUT, "/forum/post/{id}/like").authenticated()
-			.antMatchers(HttpMethod.GET, "/forum/post/{id}/**").authenticated()
+			.antMatchers(HttpMethod.PUT, "/forum/post/{id}/like").hasAnyRole("ADMINISTRATOR", "MODERATOR", "USER")
+			.antMatchers(HttpMethod.GET, "/forum/post/{id}/**").hasAnyRole("ADMINISTRATOR", "MODERATOR", "USER")
 			.antMatchers(HttpMethod.PUT, "/account/user/password").authenticated()
-			.antMatchers(HttpMethod.POST, "/account/login").authenticated()
-			.antMatchers("account/user/{login}/role/{role}").hasRole("ADMINISTRATOR")
-			.antMatchers("/account/user").authenticated()
-			.antMatchers(HttpMethod.DELETE, "/forum/post/{id}").access("@customSecurity.checkAuthorityForDeletePost(#id,authentication) or hasRole('MODERATOR')");
+			.antMatchers(HttpMethod.POST, "/account/login").hasAnyRole("ADMINISTRATOR", "MODERATOR", "USER")
+			.antMatchers("/account/user/{login}/role/{role}").hasRole("ADMINISTRATOR")
+			.antMatchers("/account/user").hasAnyRole("ADMINISTRATOR", "MODERATOR", "USER")
+			.antMatchers(HttpMethod.DELETE, "/forum/post/{id}").access("@customSecurity.checkAuthorityForPost(#id,authentication) or hasRole('MODERATOR')")
+			.antMatchers(HttpMethod.PUT, "/forum/post/{id}").access("@customSecurity.checkAuthorityForPost(#id,authentication)")
+			.antMatchers(HttpMethod.POST, "/forum/post/{author}").access("#author == authentication.name and hasAnyRole('ADMINISTRATOR', 'MODERATOR', 'USER')")
+			.antMatchers(HttpMethod.PUT, "/forum/post/{id}/comment/{author}").access("#author == authentication.name and hasAnyRole('ADMINISTRATOR', 'MODERATOR', 'USER')");
 			
 		
 	}

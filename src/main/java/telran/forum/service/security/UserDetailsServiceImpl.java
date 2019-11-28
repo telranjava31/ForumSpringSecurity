@@ -1,7 +1,6 @@
 package telran.forum.service.security;
 
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -24,12 +23,15 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		UserAccount userAccount = repository.findById(username).orElseThrow(() -> new UsernameNotFoundException(username));
 		String password = userAccount.getPassword();
-		Set<String> setRoles = userAccount.getRoles()
-				.stream()
-				.map((r)-> "ROLE_"+r.toUpperCase())
-				.collect(Collectors.toSet());
+		String[] roles = new String[0];
+		if(userAccount.getExpDate().isAfter(LocalDateTime.now())) {
+			roles = userAccount.getRoles()
+					.stream()
+					.map((r)-> "ROLE_"+r.toUpperCase())
+					.toArray(String[]::new);
+		}
 		return new User(username, password, 
-				AuthorityUtils.createAuthorityList(setRoles.toArray(new String[setRoles.size()])));
+				AuthorityUtils.createAuthorityList(roles));
 	}
 
 }
