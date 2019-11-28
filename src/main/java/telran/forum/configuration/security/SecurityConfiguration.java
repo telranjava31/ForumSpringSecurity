@@ -34,7 +34,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 			.antMatchers(HttpMethod.DELETE, "/forum/post/{id}").access("@customSecurity.checkAuthorityForPost(#id,authentication) or hasRole('MODERATOR')")
 			.antMatchers(HttpMethod.PUT, "/forum/post/{id}").access("@customSecurity.checkAuthorityForPost(#id,authentication)")
 			.antMatchers(HttpMethod.POST, "/forum/post/{author}").access("#author == authentication.name and hasAnyRole('ADMINISTRATOR', 'MODERATOR', 'USER')")
-			.antMatchers(HttpMethod.PUT, "/forum/post/{id}/comment/{author}").access("#author == authentication.name and hasAnyRole('ADMINISTRATOR', 'MODERATOR', 'USER')");
+			.antMatchers(HttpMethod.PUT, "/forum/post/{id}/comment/{author}").access("#author == authentication.name and hasAnyRole('ADMINISTRATOR', 'MODERATOR', 'USER')")
+			.antMatchers("/actuator/**").hasRole("ADMINISTRATOR");
 			
 		
 	}
